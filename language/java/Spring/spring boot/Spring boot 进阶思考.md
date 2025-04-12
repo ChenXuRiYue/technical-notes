@@ -1,6 +1,6 @@
 # Spring boot 进阶思考
 
-Spring boot 似乎是更灵活的。
+基于 Spring boot 快速配置
 
 
 
