@@ -104,3 +104,34 @@
 }
 ```
 
+**可以编译成功、但是智能检查依然报错**
+
+<img src="https://raw.githubusercontent.com/ChenXuRiYue/image-cloud/main/typora/image-20250728205445028.png" alt="image-20250728205445028" style="zoom:50%;" />
+
+<u>c_cpp_properties.json</u>
+
+```json
+{
+    "configurations": [
+        {
+            "name": "Mac",
+            "includePath": [
+                "${workspaceFolder}/**"
+            ],
+            "defines": [],
+            "compilerPath": "/usr/bin/clang++",
+            "cStandard": "c17",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "macos-clang-arm64"
+        }
+    ],
+    "version": 4
+}
+
+```
+
+如上即使配置了C++17 限制，依然会对 C++11 引入的 tuple 报警。
+
+~~未解决~~：
+
+最后全部关闭，像刷 leetcode 白板一样完成简单单文件内容填写
