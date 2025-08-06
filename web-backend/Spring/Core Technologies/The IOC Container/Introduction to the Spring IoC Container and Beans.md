@@ -1,0 +1,90 @@
+# Introduction to the Spring IoC Container and Beans
+**Dependency Injection （DI）**：依赖注入
+依赖注入（DI）是控制反转（IoC）的实现。在这种方式中，对象并不自己创建它所依赖的其他对象，而是通过以下方式声明其依赖：
+
+- 构造函数的参数
+- 工厂方法的参数
+- 或在对象创建之后，由外部设置其属性
+
+**为什么被称为控制反转？**
+这个过程从根本上说是Bean本身通过使用直接构建类或诸如服务定位模式的机制来控制其依赖关系的实例化或位置的逆过程（因此被称为控制反转）。
+
+在 IOC 容器的实现基础为： org.springframework.beans 和 org.springframework.context。
+
+**重要的类、接口：**
+
+1. BeanFactory 接口提供了高级配置机制、能够管理任何类型的对象
+2. ApplicationContext，相比于 BeanFactory
+   1. 更容易与 Spring AOP 功能集成
+   1. 信息资源处理
+   1. 事件发布
+   1. 应用层特定上下文，如 webApplicationContext 用于 web 应用
+
+
+
+比较 **BeanFactory** 和 **ApplicationContext**:
+
+BeanFactory 提供了配置框架和基本功能。
+ApplicationContext 则提供了更多企业的特定功能。
+ApplicationContext 是 BeanFactory 的一个完整的超集
+
+## 笔记补充
+
+### $BeanFactory$
+${\large {\color[RGB]{250, 157, 30}简介}} $
+
+**`BeanFactory` 是 Spring 框架中最基础的 IoC（控制反转）容器接口。** 它定义了管理任何类型对象（在 Spring 中称为 Bean）的最基本功能。
+
+${\large {\color[RGB]{250, 157, 30}常用 api}} $
+
+1. getBean
+2. containsBean
+3. isSingleton
+4. isPrototype
+5. getType
+
+等
+
+----
+
+### $ApplicationContext$
+
+${\large {\color[RGB]{250, 157, 30}简介}} $
+$ApplicationContext$ 是 $Spring$ 框架的核心接口之一，它代表了 $Spring$ 的 $IOC$ （控制反转容器）。这个容器负责创建、配置和管理 $Spring$ 应用中 $bean$ 的整个生命周期。
+
+接口。常用子接口、实现类有：WebApplicationContext、FileSystemXmlApplicationContext、ClassPathXmlApplicationContext、AnnotationConfigApplicationContext
+
+${\large {\color[RGB]{250, 157, 30}核心作用}} $
+
+1. **$Bean$ 管理**：$ApplicationContext$ 负责实例化、配置和组装应用程序中的 $bean$。定义 $bean$ 的方式有 $XML$ 配置、$Java$ 注解 或者 $Java$
+2. **依赖注入($DI$)**：实现依赖注入的容器，自动将一个 $Bean$ 所依赖的其它 $Bean$ 注入进来，无需手动创建。
+3. **配置元数据读取**：读取配置元数据（如 @Compoent，@Service，@Repository，@Controller，@configuration 等注解或者 XML 上的配置，并据此创建和管理 bean.
+
+${\large {\color[RGB]{250, 157, 30} 工作机制}} $
+
+**创建：**
+
+1. **通过 SpringApplication类**：SpringApplication 类。启动 main 方法时调用 `SpringApplication.run(MyApplication.class, args)`。该方法负责创建并配置ApplicationContext 实例。
+2. **选择合适实例：**SpringApplication 根据当前的应用类型选择合适的 ApplicationContext 实现实例
+3. **加载配置：**`ApplicationContext`创建后，Spring Boot会根据classpath下的依赖、`@SpringBootApplication`注解指定的包路径以及其他配置文件（如`application.properties`或`application.yml`）来加载bean定义并进行必要的配置。
+4. **初始化 Bean：**一旦配置完成，`ApplicationContext`会开始初始化所有单例作用域的bean。这些bean可能会有依赖关系，Spring容器会按照正确的顺序进行初始化以确保所有的依赖都得到满足。
+
+**工作：**
+一般不需要也不建议使用该接口。
+
+---
+
+### webApplicationContext 
+
+${\large {\color[RGB]{250, 157, 30}简介}} $
+
+为 $Web$ 应用程序专门设计的一个$ApplicationContext$ 应用上下文的扩展接口。它不仅包含了 ApplicationContext 的所有功能，还专门支持 web 环境下的支持。比如 用于访问 Servlet 容器的 ServletContext 对象方法，特定于 Web 的 Bean 配置，国际化支持，文件上传支持，异常处理等。
+
+
+
+
+
+
+
+
+
