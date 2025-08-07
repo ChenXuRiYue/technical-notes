@@ -1,13 +1,45 @@
 # Spring
 
+## Container Overview
+
+1. The `org.springframework.context.ApplicationContext` interface represents the Spring IoC container and is responsible for instantiating, configuring, and **assembling** the beans. 
+
+   **assembling：** 组装
+
+## Introduction to the Spring IoC Container and Beans
+
+1. Dependency injection (DI) is a specialized form of IoC, **whereby** objects define their dependencies (that is, the other objects they work with) only through constructor arguments, arguments to a factory method, or properties that are set on the object instance after it is constructed or returned from a factory method. 
+
+   **where by**：通过某种方法、手段或工具（by which / through which 通过这种方式）
+
+2. The [`BeanFactory`](https://docs.spring.io/spring-framework/docs/6.2.9/javadoc-api/org/springframework/beans/factory/BeanFactory.html) interface provides an **advanced** configuration **mechanism** capable of managing any type of object. [`ApplicationContext`](https://docs.spring.io/spring-framework/docs/6.2.9/javadoc-api/org/springframework/context/ApplicationContext.html) is a sub-interface of `BeanFactory` 
+   **advanced**：先进的、高级的 
+   **mechanism**：机制 
+
+## Core Technologies
+
+1. This part of the reference documentation covers all the technologies that are absolutely **integral** to the Spring Framework. 
+
+   **integral**：绝对不可缺的 
+
+2. **Foremost** amongst these is the Spring Framework’s Inversion of Control (IoC) container. **A thorough treatment of** the Spring Framework’s IoC container is closely followed by comprehensive coverage of Spring’s Aspect-Oriented Programming (AOP) technologies. 
+   **Foremost**：最重要的 
+   **Inversion of Control：** 控制反转 
+   **A thorough treatment of：** 对 ...... 进行彻底治疗之后、全面探讨 
+
+3. The Spring Framework has its own AOP framework, which is **conceptually** easy to understand and which successfully **addresses the 80% sweet spot of AOP requirements** in Java enterprise programming. 
+
+   **conceptually：** 概念上 
+   **addresses the 80% sweet spot of AOP requirements**：满足了 80% 最常见、最典型的AOP 使用场景 
+
 ## Spring FrameWork Overview
 
 1. Spring makes it easy to create Java **enterprise applications**.
-   **enterprise application** ：企业级应用
+   **enterprise application：企业级应用
 
 2. It provides everything you need to **embrace the Java language** in an enterprise environment, with support for Groovy and Kotlin as **alternative languages** on the JVM, and with the flexibility to create many kinds of **architectures** depending on an application’s needs. **As of** Spring Framework 6.0, Spring requires Java 17+.
 
-   **embrace the Java language** ： 拥抱Java 语言
+   **embrace the Java language** ： 拥抱 Java 语言
    **alternative languages** ：替代语言
    **the flexibility to create many kinds of architectures **：创建多种架构的灵活性
    **As of** 从....开始
