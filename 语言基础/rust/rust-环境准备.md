@@ -44,9 +44,11 @@ cargo --version
 ### 🔖 vscode 配置
 
 1. rust-analyzer
-   使用 cargo 初始化目录即可
+   使用 cargo 初始化目录即可。
 
+   该插件的主要功能为：实时编译分析，提示代码错误，并且对类型进行标注
 
+2. TOML：配置文件语言检查
 
 
 
