@@ -73,3 +73,21 @@ INSERT INTO students (student_name, class_id, score) VALUES
 ('郑强', 5, 91.10),
 ('王敏', 5, 84.70);
 ```
+
+### 为表添加字段
+
+为班级添加班级口号：
+
+```sql
+ALTER TABLE classes
+ADD COLUMN slogan VARCHAR(500) DEFAULT NULL COMMENT '班级口号';
+```
+
+同时加多个字段
+
+```sql
+ALTER TABLE classes
+ADD COLUMN slogan VARCHAR(500) DEFAULT NULL COMMENT '班级口号',
+ADD COLUMN homeroom_teacher VARCHAR(100) DEFAULT NULL COMMENT '班主任姓名';
+```
+
