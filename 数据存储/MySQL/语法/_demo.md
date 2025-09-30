@@ -91,3 +91,11 @@ ADD COLUMN slogan VARCHAR(500) DEFAULT NULL COMMENT '班级口号',
 ADD COLUMN homeroom_teacher VARCHAR(100) DEFAULT NULL COMMENT '班主任姓名';
 ```
 
+### 删除表中的字段
+
+```mysql
+ALTER TABLE classes
+DROP COLUMN slogan,
+DROP COLUMN homeroom_teacher;
+```
+
