@@ -74,6 +74,25 @@ INSERT INTO students (student_name, class_id, score) VALUES
 ('王敏', 5, 84.70);
 ```
 
+### 更新数据
+
+```mysql
+UPDATE schools
+SET school_name = '新阳光中学'
+WHERE school_name = '阳光中学';
+```
+
+
+
+### 删除数据
+
+```mysql
+DELETE FROM schools
+WHERE school_name = '光明中学';
+```
+
+
+
 ### 为表添加字段
 
 为班级添加班级口号：
@@ -97,5 +116,19 @@ ADD COLUMN homeroom_teacher VARCHAR(100) DEFAULT NULL COMMENT '班主任姓名';
 ALTER TABLE classes
 DROP COLUMN slogan,
 DROP COLUMN homeroom_teacher;
+```
+
+
+
+## 为表修改字段
+
+```mysql
+示例 1：将 school_name 的长度从 255 改为 128，并添加注释
+ALTER TABLE schools
+MODIFY COLUMN school_name VARCHAR(128) NOT NULL UNIQUE COMMENT '学校名称';
+
+示例 2：为 create_time 添加注释
+ALTER TABLE schools
+MODIFY COLUMN create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间';
 ```
 
