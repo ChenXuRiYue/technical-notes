@@ -118,9 +118,24 @@ DROP COLUMN slogan,
 DROP COLUMN homeroom_teacher;
 ```
 
+### 为表新增索引
+
+```mysql
+-- 示例：为已有表添加索引
+
+-- 1. 为主键字段添加唯一索引（虽然冗余，但若用于演示语法，可注明）
+-- 注意：实际中主键已隐式创建唯一索引，此操作通常不必要
+ALTER TABLE schools 
+ADD UNIQUE INDEX uidx_school_id (school_id);  -- 仅作语法示例
+
+-- 2. 为包含 score 字段的表添加普通索引（修正表名）
+ALTER TABLE students 
+ADD INDEX idx_score (score);
+```
 
 
-## 为表修改字段
+
+### 为表修改字段
 
 ```mysql
 示例 1：将 school_name 的长度从 255 改为 128，并添加注释
