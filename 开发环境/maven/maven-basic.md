@@ -106,6 +106,101 @@ Maven 的演进大致可分为几个阶段：
 </project>
 ```
 
+## 📄 maven 三大核心生命周期
+
+### 1. **clean 生命周期**
+
+**目的**：清理项目构建产物（主要是 `target/` 目录）。
+
+#### 阶段（phases）：
+
+- `pre-clean`
+- `clean` ← **最常用**，默认绑定 `maven-clean-plugin:clean`
+- `post-clean`
+
+```
+mvn clean
+```
+
+→ 删除 `target/` 目录，确保下一次构建从“干净状态”开始。
+
+> 💡 注意：`clean` 是一个独立生命周期。执行 `mvn clean compile` 会先运行 clean lifecycle，再运行 default lifecycle 到 `compile`。
+
+------
+
+### 2. **default 生命周期**
+
+**目的**：完成项目的主要构建流程——从源码到可部署构件（artifact）。
+
+这是你日常打交道最多的生命周期，包含如 `compile`、`test`、`package`、`install`、`deploy` 等关键阶段（前面已详述）。
+
+核心阶段节选：
+
+- `validate` → `compile` → `test` → `package` → `verify` → `install` → `deploy`
+
+典型用法：
+
+```
+mvn package      # 构建 JAR/WAR
+mvn install      # 构建并安装到本地仓库
+mvn deploy       # 构建并发布到远程仓库
+```
+
+> ✅ 这是 Maven “构建”的主干道。
+
+------
+
+### 3. **site 生命周期**
+
+**目的**：生成项目站点文档（project site），包括报告、依赖分析、测试覆盖率等。
+
+在现代开发中使用较少（尤其在微服务+CI/CD普及后），但在需要生成正式项目文档或合规报告时仍有价值。
+
+阶段（phases）：
+
+- `pre-site`
+- `site` ← 绑定 `maven-site-plugin:site`，生成 HTML 站点
+- `post-site`
+- `site-deploy` ← 将站点部署到服务器（如 Web 服务器）
+
+典型用法：
+
+```
+mvn site
+```
+
+→ 在 `target/site/` 下生成静态网站，包含：
+
+- 项目信息（POM 元数据）
+- 依赖树
+- Javadoc
+- Surefire 测试报告
+- Checkstyle / PMD / Jacoco 覆盖率（如果配置了相关插件）
+
+> 📌 注意：site 生命周期的实用性高度依赖插件配置。默认生成的内容较基础，需显式引入报告插件才能丰富内容。
+
+### 三大生命周期的关系：
+
+**完全独立**
+
+- 执行 `mvn clean` **不会**触发 default 或 site。
+- 执行 `mvn deploy` **不会**自动 clean。
+- 执行 `mvn site` **不会**编译代码（除非你手动绑定插件到 site 阶段）。
+
+但你可以**组合调用**：
+
+```
+mvn clean site deploy
+```
+
+→ 依次执行：
+
+1. clean lifecycle（清空 target）
+2. site lifecycle（生成文档）
+3. default lifecycle（直到 deploy）
+
+
+
 ## 🌳 生长思考
 
 对发散的自由捕捉、精确化
