@@ -41,6 +41,15 @@ curl -L -o ckey.run ckey.run && bash ckey.run
 
 
 
+
+
+## ⚙️ 其它配置
+
+- 配置自动去除无效 import
+  https://developer.aliyun.com/article/1349713
+
+
+
 ## ⚙️ 配置文件
 
 ### ❓ .idea 文件夹是什么？
