@@ -34,6 +34,67 @@ for url in sorted(all_clone_urls):
     print(url)
 ```
 
+2026 年 2 月 3 日 记： AI 至少 opencode + glm4.7 一次性解决所有项目是行不通的。
+可以考虑分批处理：
+
+````markdown
+# 背景
+你是一个精通 Java后端 IT 环境的专家
+我需要你帮助团队完成一项横向工作：
+
+# 工作内容
+根据脚本将团队所有项目导入到本地，
+并且划分若干个不同文件夹中。
+每个文件夹 30 个项目。
+每个文件夹下给定一个 项目清单，方便后续 AI 介入，有明确顺序的处理项目
+
+# 配置上下文
+## gitlab
+由于要调用 gitlab api。后续我将为你提供脚本。
+这里是一些相关配置，需要你替换：
+- GITLAB_URL = https://git.sample.com/
+- TOKEN = aaaa
+- namespace = "aaaa"
+
+# 参考
+## 拉取所有项目
+我已打通了 gitlab 的一些信息。你可以通过这个 python 脚本，得到所有项目的 ssh clone 命令。
+```python
+import os
+import requests
+from urllib.parse import quote
+
+GITLAB_URL = "https://git.sample.com/"
+TOKEN = "sample"
+
+namespace = "aaaa"  # ← 改这里！支持子群组，如 "user" 或 "team/backend"
+
+headers = {"PRIVATE-TOKEN": TOKEN}
+params = {"simple": True,
+          "per_page": 100,
+          "with_shared": False,  # 排除共享项目
+          "page": 1}
+all_clone_urls = []
+
+while True:
+    resp = requests.get(f"{GITLAB_URL}/api/v4/groups/{namespace}/projects", headers=headers, params=params)
+    projects = resp.json()
+    if not projects:
+        break
+    for p in projects:
+        all_clone_urls.append(p["ssh_url_to_repo"])
+    params["page"] += 1
+
+for url in sorted(all_clone_urls):
+    print("git clone " + url)
+```
+
+````
+
+
+
+
+
 ### 🔖 推送提交到 gitlab
 
 ```bash
