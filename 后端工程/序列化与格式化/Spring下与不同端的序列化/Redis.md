@@ -82,6 +82,57 @@ Redis 接收的数据格式并非随意的字节流，而是 RESP （Redis Seria
 
 - 服务端接收和存储
 
+## 📄 踩坑纪录
+
+- 序列化结果，带上类信息。如 jackson 默认序列化方式下：
+
+  ```java
+  {
+      "@class": "com.mi.car.iccc.aimusic.web.model.co.ItemWithMusicCo",
+      "artistName": "artist_update",
+      "duration": 123200,
+      "file": [
+          "java.util.Collections$SingletonList",
+          [
+              {
+                  "@class": "com.mi.car.iccc.aimusic.web.model.co.MusicFileCo",
+                  "bucket": "",
+                  "md5": "",
+                  "object": "",
+                  "size": 2.7,
+                  "url": "https://cnbj1-fds.api.xiaomi.net/music-radio/audio_test/1-活力启动0/2_活力启动_Tropical_House_Mood-romantic;Genre-ambient;Instrument-synthesizer,xiangzhi,electronicdrum;Additional_Genre-Tropical-House,Deep-House_None_bpm124.mp3",
+                  "validTime": "4895399537859"
+              }
+          ]
+      ],
+      "groupEndTime": "2099-01-01T00:00:00",
+      "groupStartTime": "2000-01-01T00:00:00",
+      "itemEndTime": "2099-01-01T00:00:00",
+      "itemId": "3792336030787436545",
+      "itemStartTime": "2000-01-01T00:00:00",
+      "itemTitle": "testcase2_update",
+      "itemVisible": 1,
+      "itemWeight": 0,
+      "musicId": "3789295498884546563",
+      "source": "test_update_source",
+      "tagList": [
+          "java.util.ArrayList",
+          [
+              "tag_style_2",
+              "tag_sense_2"
+          ]
+      ]
+  }
+  ```
+
+  - 优点
+    - 序列化方式快
+    - 信息丰富
+  - 缺点
+    - 不容易迁移（比如类名变更）
+  - 启发
+    - 使用序列化工具、或者新增工具时，注意检查。避免踩坑。
+
 ## 📄 web 业务场景
 
 ### 🔖 缓存模式演进
