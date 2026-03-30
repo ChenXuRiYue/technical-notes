@@ -1,22 +1,8 @@
-# 📌 标题
+# 📌 HTTP 与序列化
 
-基础谈资。即和新人介绍相关内容时，最该侃侃而谈的内容
+## 📄 坑
 
-
-
-## 📄 topic - 1
-
-精细化的主题划分1
-
-
-
-## 📄 topic - 2
-
-
-
-## 📄 topic - 3
-
-### 🔖 topic - 3.1
+1. Json 格式下，Long 转为 Double 会丢失精度。HTTP body ，response 使用 Json 格式。
 
 
 
