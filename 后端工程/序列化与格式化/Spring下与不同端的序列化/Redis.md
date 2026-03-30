@@ -242,7 +242,52 @@ Redis 接收的数据格式并非随意的字节流，而是 RESP （Redis Seria
 
 ## 💭 反复绊脚
 
-记录回顾、使用文档时，遇到的困惑
+1. JackSon 没找到一个真正生效的 去除 @class 的序列化配置。如下配置没生效
+
+   ```java
+   package com.mi.car.iccc.aimusic.operation.configuration;
+   
+   import com.fasterxml.jackson.annotation.JsonInclude;
+   import com.fasterxml.jackson.databind.ObjectMapper;
+   import com.fasterxml.jackson.databind.SerializationFeature;
+   import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+   import org.redisson.codec.JsonJacksonCodec;
+   import org.redisson.spring.starter.RedissonAutoConfigurationCustomizer;
+   import org.springframework.context.annotation.Bean;
+   import org.springframework.context.annotation.Configuration;
+   
+   /**
+    * @author Axel.Xun
+    * @since 2026/01/20/20:13
+    * Redisson
+    */
+   @Configuration
+   public class RedissonCustomConfig {
+       @Bean
+       public RedissonAutoConfigurationCustomizer redissonAutoConfigurationCustomizer() {
+           return config -> {
+               // 【关键】在这里直接构建一个确保安全的 ObjectMapper，不依赖外部注入
+               ObjectMapper mapper = new ObjectMapper();
+   
+               // 1. 强制注册 JavaTimeModule (解决 LocalDateTime 问题)
+               mapper.registerModule(new JavaTimeModule());
+   
+               // 2. 强制关闭时间戳 (对应你的 yml 配置)
+               mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+   
+               // 3. 关闭 Jackson 的类信息序列化，避免带 @class 信息
+               mapper.deactivateDefaultTyping();
+   
+               mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+   
+               config.setCodec(new JsonJacksonCodec(mapper));
+           };
+       }
+   }
+   
+   ```
+
+   
 
 ## 🗺️ 修订记录
 
