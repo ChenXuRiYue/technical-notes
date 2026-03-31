@@ -1,4 +1,4 @@
-# 🛠️ Git Note
+# 🛠️ [GitTributary](https://github.com/ChenXuRiYue/GitTributary)
 
 ## 🗺️ 背景
 
