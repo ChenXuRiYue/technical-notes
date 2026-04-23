@@ -1,43 +1,48 @@
-# Mac-language
+# VS Code Mac 开发环境配置
 
-# C++
+## C++ 开发环境
 
-## **Mac Pro 配置 GCC 环境**
+#### 背景
 
-### **mac 配置 clang**
+Mac 上使用 VS Code 配置 C++ 简单运行环境，满足：
+1. 一键编译运行（`Ctrl+Shift+B`）
+2. VS Code 终端中输入输出
+3. 适合竞赛刷题场景
 
-目标是配置简单的 C++ 运行环境。可以一键运行在终端中输入输出，方便竞赛以及补题。
+#### 必备插件
 
-插件：
-**Code Runner**
-**C/C++ Clang Command Adapter**
-**CodeLLDB 
-[配置文件-c++.md](配置文件-c++.md) **
+- **Code Runner** - 一键运行
+- **C/C++ Clang Command Adapter** - 智能提示
+- **CodeLLDB** - 调试支持
 
-**vs code: 任务系统 task**
-[配置文件-c++.md](配置文件-c++.md) 
+#### 配置文件说明
 
-```markdown
-# 背景
-我是一名竞赛爱好者，我刚换了一台 mac。但是我并不熟悉 mac 竞赛环境的配置。我希望摸索 vscode  C++ 简单代码的运行环境：
-使得它可以满足以下效果：
-1. 一键即运行
-2. vscode 终端中输入输出。
+VS Code 使用 `.vscode` 文件夹中的 JSON 文件来管理项目的编译、运行、调试和智能提示等行为。
 
-# 待解决问题：
-```
+| 文件                    | 功能                 | 是否调试用 | 是否编译用 | 是否必须 |
+| ----------------------- | -------------------- | ---------- | ---------- | -------- |
+| `tasks.json`            | 定义编译/运行任务    | ❌          | ✅          | ✅ 通常需要 |
+| `launch.json`           | 调试器配置           | ✅          | ❌          | ❌ 仅调试时需要 |
+| `c_cpp_properties.json` | 智能提示和编译器设置 | ❌          | ❌（辅助）  | ✅ 用于补全和跳转 |
 
-配置上比较简单：
+#### 实际工作流
 
-配置如上执行流：并且对编译并运行设置为默认模式模式，使用 control shift B 可以快速编译并运行
+1. **写代码**（`main.cpp`）
+2. **VS Code 使用 `c_cpp_properties.json` 提供代码补全和跳转**
+3. **按下 `Ctrl+Shift+B`，VS Code 执行 `tasks.json` 中的编译并运行任务**
+4. **按下 `F5`，VS Code 根据 `launch.json` 启动调试器开始调试**
 
-**Task.json**
+#### 配置模板
+
+##### ✅ `.vscode/tasks.json`
+
+包含三个任务：默认的"生成并运行"、"生成活动文件"（仅编译）、"运行程序"（仅运行）。
 
 ```json
 {
   "version": "2.0.0",
   "tasks": [
-        {
+    {
       "label": "生成并运行",
       "type": "shell",
       "command": "sh",
@@ -104,34 +109,50 @@
 }
 ```
 
-**可以编译成功、但是智能检查依然报错**
-
-<img src="https://raw.githubusercontent.com/ChenXuRiYue/image-cloud/main/typora/image-20250728205445028.png" alt="image-20250728205445028" style="zoom:50%;" />
-
-<u>c_cpp_properties.json</u>
+##### ✅ `.vscode/launch.json`
 
 ```json
 {
-    "configurations": [
-        {
-            "name": "Mac",
-            "includePath": [
-                "${workspaceFolder}/**"
-            ],
-            "defines": [],
-            "compilerPath": "/usr/bin/clang++",
-            "cStandard": "c17",
-            "cppStandard": "c++17",
-            "intelliSenseMode": "macos-clang-arm64"
-        }
-    ],
-    "version": 4
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "C++ Debug",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${fileDirName}/${fileBasenameNoExtension}",
+      "args": [],
+      "stopAtEntry": false,
+      "cwd": "${fileDir}",
+      "environment": [],
+      "externalConsole": false,
+      "MIMode": "lldb"
+    }
+  ]
 }
-
 ```
 
-如上即使配置了C++17 限制，依然会对 C++11 引入的 tuple 报警。
+##### ✅ `.vscode/c_cpp_properties.json`
 
-~~未解决~~：
+```json
+{
+  "configurations": [
+    {
+      "name": "Mac",
+      "includePath": ["${workspaceFolder}/**"],
+      "defines": [],
+      "macFrameworkPath": ["/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks"],
+      "compilerPath": "/usr/bin/clang++",
+      "cStandard": "c17",
+      "cppStandard": "c++17",
+      "intelliSenseMode": "macos-clang-arm64"
+    }
+  ],
+  "version": 4
+}
+```
 
-最后全部关闭，像刷 leetcode 白板一样完成简单单文件内容填写
+#### 注意事项
+
+- **智能检查报错问题**：即使配置了 C++17，可能仍对某些标准库报错（如 tuple）。如果不需要智能提示，可以像 LeetCode 白板一样直接关闭。
+- 如果使用 `g++`，将 `compilerPath` 改为 `/usr/local/bin/g++`（需先安装 GCC）
+- 使用第三方库（如 OpenCV）需要在 `c_cpp_properties.json` 中添加头文件路径
