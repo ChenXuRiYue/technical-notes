@@ -63,7 +63,8 @@ pub enum PluginError {
 }
 ```
 
-**思考：** 为什么 `ManifestParse` 存的是 `String` 而不是 `serde_json::Error`？
+**思考：** 为什么 `ManifestParse` 存
+的是 `String` 而不是 `serde_json::Error`？
 
 ### Step 3: 实现错误转换
 

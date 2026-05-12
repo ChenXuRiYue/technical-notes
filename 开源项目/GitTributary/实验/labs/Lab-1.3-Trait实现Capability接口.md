@@ -14,7 +14,7 @@
 - [ ] 为同一 trait 编写多个实现（mock + real）
 - [ ] 使用 trait bound（`fn foo<T: GitRead>`）编写泛型函数
 - [ ] 使用 trait object（`Box<dyn GitRead>`）实现运行时多态
-- [ ] 理解泛型 vs trait object 的取舍
+- [ ] 理解泛型 vs trait object 的取
 
 ## 2. Background
 
