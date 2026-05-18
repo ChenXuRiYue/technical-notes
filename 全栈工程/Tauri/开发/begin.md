@@ -16,6 +16,17 @@ cargo install create-tauri-app --locked
 cargo create-tauri-app
 ```
 
+**解读：**
+
+>cargo install
+>从 rust 官方仓库 （creates.io）下载指定程序编译安装到本地电脑里，使其成为终端可以运行的千古工具
+>
+>create-tauri-app
+>用于创建 Tauri 桌面端应用项目的脚手架工具
+>
+>--lockde
+>强制 Cargo 严格遵循该程自带 的 Cargo.lock 锁定文件来安装依赖。如果没有这个参数，Cargo 可能会去自动拉取某些依赖库的最新小版本。虽然看起来是“更新”，但有时新版本的微小变动可能会引入未知的 Bug 或与当前环境不兼容，导致安装失败或工具运行异常。加上 `--locked` 就能完美避开这种“依赖漂移”带来的风险。
+
 运行：
 
 ```cargo
