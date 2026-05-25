@@ -36,3 +36,20 @@ JDK 14+ 的“变革”：从 JDK 9 开始引入模块化（Project Jigsaw），
 
 TODO：水有点深。日后再深究
 
+## 侧边栏新项目无 Maven 插件按钮
+
+**错误还原：**
+
+- IDEA 打开一个项目（新引入，或者已有项目）
+- 侧边栏没有出现 Maven 相关的插件按钮（如 Maven 工具窗口、生命周期按钮等）
+
+**分析：**
+
+IDEA 没有自动识别该项目为 Maven 项目。常见于从外部导入或手动打开的项目，IDEA 未触发 POM 文件的自动解析。
+
+**解决：**
+
+1. 右键 `pom.xml` → `Add as Maven Project`（让 IDEA 识别项目为 Maven 项目）
+2. 识别后仍未生效：侧边栏 Maven 面板中点击刷新按钮 reimport
+3. 仍不生效：`File → Project Structure → Modules` → `+` → `Import Module` → 选择 `pom.xml` → `Add as Maven Project`
+
