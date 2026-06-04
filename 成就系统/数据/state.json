@@ -1,18 +1,18 @@
 {
   "realm": "🔥 火种",
-  "exp_total": 0,
-  "coin_balance": 0,
-  "combo": 0,
-  "last_active_date": null,
-  "daily_streak": 0,
-  "active_days_total": 0,
-  "tasks_completed": 0,
+  "exp_total": 3,
+  "coin_balance": 1,
+  "combo": 1,
+  "last_active_date": "2026-06-04",
+  "daily_streak": 1,
+  "active_days_total": 1,
+  "tasks_completed": 1,
   "notes_count": 0,
   "achievements": [],
   "season": {
-    "month": "2026-06", "month_exp": 0, "month_next": 16,
-    "quarter": "2026-Q2", "quarter_exp": 0, "quarter_next": 61,
-    "year": "2026", "year_exp": 0, "year_next": 201,
+    "month": "2026-06", "month_exp": 3, "month_next": 16,
+    "quarter": "2026-Q2", "quarter_exp": 3, "quarter_next": 61,
+    "year": "2026", "year_exp": 3, "year_next": 201,
     "month_challenge": null
   }
 }
