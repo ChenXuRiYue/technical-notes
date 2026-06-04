@@ -48,6 +48,12 @@ def append_jsonl(path, obj):
         f.write(json.dumps(obj, ensure_ascii=False) + "\n")
 
 
+def bar(cur, nxt, width=6):
+    """按 cur/nxt 比例渲染进度条，避免固定空槽造成误解。"""
+    n = min(width, round(width * cur / nxt)) if nxt else 0
+    return "▰" * n + "▱" * (width - n)
+
+
 def dice_roll(ts_str, task_name):
     h = 0
     for c in ts_str + task_name:
@@ -103,118 +109,73 @@ def update_season(season, exp_gain):
     return upgrades
 
 
-def move_task_to_conquered(task_name, tier_emoji, zone, roll, exp, coin, crit):
-    """从任务面板删除任务，追加到已征服区。"""
-    text = TASK_PANEL.read_text(encoding="utf-8")
-    lines = text.split("\n")
+def update_task_panel(task_name, tier_emoji, zone, roll, exp, coin, crit, state):
+    """一次读写：刷新顶栏、删除已完成任务、清理废弃(删除线)条目、追加到已征服区。
+    返回 (removed, trashed_items)。"""
+    lines = TASK_PANEL.read_text(encoding="utf-8").split("\n")
+    today = date.today().isoformat()
 
-    # 找到并删除任务行
+    # 顶栏按 state 重渲染（与结算卡同源，保持一致）
+    sea = state["season"]
+    em, _, nm = state["realm"].partition(" ")
+    topbar = {
+        ("经验", "连击"): f"> {em} **{nm}** ｜ 经验 {state['exp_total']} · 金币 {state['coin_balance']} · 连击 {state['combo']}",
+        ("⛰️ 月",): f"> ⛰️ 月 `⛺扎营` {bar(sea['month_exp'], sea['month_next'])} {sea['month_exp']}/{sea['month_next']}",
+        ("🌊 季",): f"> 🌊 季 `🏖️港湾` {bar(sea['quarter_exp'], sea['quarter_next'])} {sea['quarter_exp']}/{sea['quarter_next']}",
+        ("🌍 年",): f"> 🌍 年 `🌱苔原` {bar(sea['year_exp'], sea['year_next'])} {sea['year_exp']}/{sea['year_next']}",
+    }
+
     removed = False
-    new_lines = []
+    trashed = []
+    kept = []
     for line in lines:
-        stripped = line.strip()
-        if stripped.startswith("- [ ]") or stripped.startswith("- [x]"):
-            # 提取任务名（去掉 checkbox 和档位数字）
-            content = stripped.split("]", 1)[1].strip() if "]" in stripped else ""
-            # 去掉末尾的档位数字
+        s = line.strip()
+        # 刷新顶栏行
+        if line.startswith(">"):
+            repl = next((v for ks, v in topbar.items() if all(k in s for k in ks)), line)
+            kept.append(repl)
+            continue
+        # 清理废弃任务（带 ~~删除线~~）
+        if s.startswith("- [") and "~~" in s:
+            a = s.find("~~")
+            b = s.find("~~", a + 2)
+            if a != -1 and b != -1:
+                reason = s[b + 2:].strip() or "废弃"
+                trashed.append(f"- {s[a:b+2]} ｜ {reason}（{today}）")
+                continue
+        # 删除本次完成的任务
+        if not removed and (s.startswith("- [ ]") or s.startswith("- [x]")):
+            content = s.split("]", 1)[1].strip()
             parts = content.rsplit(" ", 1)
             if len(parts) > 1 and parts[-1].isdigit():
                 content = parts[0].strip()
             if content == task_name:
                 removed = True
                 continue
-        new_lines.append(line)
+        kept.append(line)
 
     if not removed:
         print(f"⚠️  未在任务面板找到任务：{task_name}")
-        return
 
-    # 构造已征服行
+    # 在已征服区最后一条记录后插入
     crit_mark = " 🎰" if crit else ""
-    conquered_line = (
-        f"{tier_emoji} {task_name}   "
-        f"`{zone} 掷{roll}`  "
-        f"`+{exp}exp +{coin}coin`{crit_mark}"
-    )
-
-    # 找到已征服区，追加
-    final_lines = []
-    in_conquered = False
-    inserted = False
-    for line in new_lines:
+    conquered = f"{tier_emoji} {task_name}   `{zone} 掷{roll}`  `+{exp}exp +{coin}coin`{crit_mark}"
+    insert_idx = len(kept)
+    for i, line in enumerate(kept):
         if "🏆 已征服" in line:
-            in_conquered = True
-        if in_conquered and not inserted and line.strip() == "":
-            # 在已征服区最后一条记录后插入
-            pass
-        final_lines.append(line)
-
-    # 重新扫描，在已征服区最后一行非空记录后插入
-    result = []
-    last_conquered_idx = -1
-    for i, line in enumerate(final_lines):
-        if "🏆 已征服" in final_lines[max(0, i-2):i+1] or any("🏆 已征服" in l for l in final_lines[max(0,i-5):i+1]):
-            pass
-        result.append(line)
-
-    # 更简单的方式：找到已征服区，在分隔线前插入
-    final = []
-    found_conquered = False
-    for line in new_lines:
-        if "🏆 已征服" in line:
-            found_conquered = True
-        final.append(line)
-
-    # 在已征服区最后一行后追加
-    # 找到最后一个非空行的位置
-    insert_idx = len(final)
-    for i in range(len(final) - 1, -1, -1):
-        if "🏆 已征服" in final[i]:
-            # 找到已征服标题，往后找最后一条记录
-            for j in range(i + 1, len(final)):
-                if final[j].strip().startswith(("⚡", "🟢", "🟡", "🔴", "💀")):
+            for j in range(i + 1, len(kept)):
+                if kept[j].strip().startswith(("⚡", "🟢", "🟡", "🔴", "💀")):
                     insert_idx = j + 1
-                elif final[j].strip() and not final[j].strip().startswith((">", "-")):
-                    break
             break
+    kept.insert(insert_idx, conquered)
+    TASK_PANEL.write_text("\n".join(kept), encoding="utf-8")
 
-    final.insert(insert_idx, conquered_line)
-    TASK_PANEL.write_text("\n".join(final), encoding="utf-8")
-    return True
-
-
-def clean_trash():
-    """扫描任务面板中的删除线条目，移到垃圾桶。"""
-    text = TASK_PANEL.read_text(encoding="utf-8")
-    lines = text.split("\n")
-
-    trash_items = []
-    new_lines = []
-    today = date.today().isoformat()
-
-    for line in lines:
-        stripped = line.strip()
-        if "~~" in stripped and stripped.startswith("- ["):
-            # 提取删除线内容
-            start = stripped.find("~~")
-            end = stripped.find("~~", start + 2)
-            if start != -1 and end != -1:
-                task_text = stripped[start:end+2]
-                # 提取弃因（删除线后面的文字）
-                after = stripped[end+2:].strip()
-                reason = after if after else "废弃"
-                trash_items.append(f"- {task_text} ｜ {reason}（{today}）")
-                continue
-        new_lines.append(line)
-
-    if trash_items:
-        TASK_PANEL.write_text("\n".join(new_lines), encoding="utf-8")
+    # 废弃条目落入垃圾桶
+    if trashed:
         trash_text = TRASH.read_text(encoding="utf-8").rstrip()
-        for item in trash_items:
-            trash_text += "\n" + item
-        TRASH.write_text(trash_text + "\n", encoding="utf-8")
+        TRASH.write_text(trash_text + "\n" + "\n".join(trashed) + "\n", encoding="utf-8")
 
-    return trash_items
+    return removed, trashed
 
 
 def main():
@@ -281,11 +242,8 @@ def main():
     state["season"] = season
     save_json(DATA / "state.json", state)
 
-    # 移动任务到已征服
-    move_task_to_conquered(task_name, tier_emoji, zone_name, roll, exp_gain, coin_gain, crit)
-
-    # 清理废弃任务
-    trashed = clean_trash()
+    # 移动任务到已征服 + 清理废弃任务 + 刷新顶栏（单次读写）
+    _, trashed = update_task_panel(task_name, tier_emoji, zone_name, roll, exp_gain, coin_gain, crit, state)
 
     # 输出结算卡
     old_exp = state["exp_total"] - exp_gain
@@ -299,10 +257,13 @@ def main():
     if new_combo >= 2:
         print(f"│ 🔥 连击 ×{new_combo}  (+{combo_bonus})")
     print("│ ──────────────────────")
+    me, mn = season.get("month_exp", 0), season.get("month_next", 16)
+    qe, qn = season.get("quarter_exp", 0), season.get("quarter_next", 61)
+    ye, yn = season.get("year_exp", 0), season.get("year_next", 201)
     print(f"│ 🔥 境界 {state['realm']} ｜ 经验 {old_exp}→{state['exp_total']} · 金币 {old_coin}→{state['coin_balance']}")
-    print(f"│ ⛰️ 月 ⛺扎营 ▱▱▱▱▱▱ {season.get('month_exp',0)}/{season.get('month_next',16)}")
-    print(f"│ 🌊 季 🏖️港湾 ▱▱▱▱▱▱ {season.get('quarter_exp',0)}/{season.get('quarter_next',61)}")
-    print(f"│ 🌍 年 🌱苔原 ▱▱▱▱▱▱ {season.get('year_exp',0)}/{season.get('year_next',201)}")
+    print(f"│ ⛰️ 月 ⛺扎营 {bar(me, mn)} {me}/{mn}")
+    print(f"│ 🌊 季 🏖️港湾 {bar(qe, qn)} {qe}/{qn}")
+    print(f"│ 🌍 年 🌱苔原 {bar(ye, yn)} {ye}/{yn}")
     if upgrades:
         for u in upgrades:
             print(f"│ 🎉 {u}")
