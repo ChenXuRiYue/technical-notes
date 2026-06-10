@@ -12,7 +12,7 @@
 import json
 import sys
 import hashlib
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 from pathlib import Path
 
 BASE = Path(__file__).resolve().parent.parent  # 成就系统/
@@ -64,11 +64,11 @@ def dice_roll(ts_str, task_name):
 def calc_combo(state, today_str):
     last = state.get("last_active_date", "")
     if last == today_str:
+        return state["combo"]  # 同一天内完成多个任务，保持连击不变
+    yesterday = (date.today() - timedelta(days=1)).isoformat()
+    if last == yesterday:
         return state["combo"] + 1
-    elif last == (date.today().replace(day=date.today().day - 1)).isoformat():
-        return state["combo"] + 1
-    else:
-        return 1
+    return 1
 
 
 def calc_daily_streak(state, today_str):
@@ -90,22 +90,43 @@ def calc_active_days(state, today_str):
     return state["active_days_total"] + 1
 
 
+# 赛季档位：[阈值, 名称]
+MONTH_TIERS = [(16, "⛺扎营"), (41, "🥾攀登"), (81, "🏔️雪线"), (float("inf"), "🚩登顶")]
+QUARTER_TIERS = [(61, "🏖️港湾"), (151, "🌊近海"), (281, "🌀远洋"), (float("inf"), "🐉深渊")]
+YEAR_TIERS = [(201, "🌱苔原"), (501, "🌾草原"), (901, "🌳森林"), (1401, "🌲密林"), (float("inf"), "🌍大陆")]
+
+
+def current_tier(exp, tiers):
+    """返回 (当前档位名称, 下一级阈值)。"""
+    prev = 0
+    for nxt, name in tiers:
+        if exp < nxt:
+            return name, nxt
+        prev = nxt
+    return tiers[-1][1], float("inf")
+
+
 def update_season(season, exp_gain):
     now = datetime.now()
     season["month_exp"] += exp_gain
     season["quarter_exp"] += exp_gain
     season["year_exp"] += exp_gain
-    # 检查赛季突破
     upgrades = []
     if season["month_exp"] >= season["month_next"]:
-        old = season["month_exp"] - exp_gain
-        upgrades.append(f"⛰️ 月赛季突破！{old}→{season['month_exp']}")
+        old_name, _ = current_tier(season["month_exp"] - exp_gain, MONTH_TIERS)
+        new_name, new_next = current_tier(season["month_exp"], MONTH_TIERS)
+        season["month_next"] = new_next
+        upgrades.append(f"⛰️ 月赛季突破！{old_name}→{new_name}")
     if season["quarter_exp"] >= season["quarter_next"]:
-        old = season["quarter_exp"] - exp_gain
-        upgrades.append(f"🌊 季赛季突破！{old}→{season['quarter_exp']}")
+        old_name, _ = current_tier(season["quarter_exp"] - exp_gain, QUARTER_TIERS)
+        new_name, new_next = current_tier(season["quarter_exp"], QUARTER_TIERS)
+        season["quarter_next"] = new_next
+        upgrades.append(f"🌊 季赛季突破！{old_name}→{new_name}")
     if season["year_exp"] >= season["year_next"]:
-        old = season["year_exp"] - exp_gain
-        upgrades.append(f"🌍 年赛季突破！{old}→{season['year_exp']}")
+        old_name, _ = current_tier(season["year_exp"] - exp_gain, YEAR_TIERS)
+        new_name, new_next = current_tier(season["year_exp"], YEAR_TIERS)
+        season["year_next"] = new_next
+        upgrades.append(f"🌍 年赛季突破！{old_name}→{new_name}")
     return upgrades
 
 
@@ -118,11 +139,14 @@ def update_task_panel(task_name, tier_emoji, zone, roll, exp, coin, crit, state)
     # 顶栏按 state 重渲染（与结算卡同源，保持一致）
     sea = state["season"]
     em, _, nm = state["realm"].partition(" ")
+    month_name, _ = current_tier(sea["month_exp"], MONTH_TIERS)
+    quarter_name, _ = current_tier(sea["quarter_exp"], QUARTER_TIERS)
+    year_name, _ = current_tier(sea["year_exp"], YEAR_TIERS)
     topbar = {
         ("经验", "连击"): f"> {em} **{nm}** ｜ 经验 {state['exp_total']} · 金币 {state['coin_balance']} · 连击 {state['combo']}",
-        ("⛰️ 月",): f"> ⛰️ 月 `⛺扎营` {bar(sea['month_exp'], sea['month_next'])} {sea['month_exp']}/{sea['month_next']}",
-        ("🌊 季",): f"> 🌊 季 `🏖️港湾` {bar(sea['quarter_exp'], sea['quarter_next'])} {sea['quarter_exp']}/{sea['quarter_next']}",
-        ("🌍 年",): f"> 🌍 年 `🌱苔原` {bar(sea['year_exp'], sea['year_next'])} {sea['year_exp']}/{sea['year_next']}",
+        ("⛰️ 月",): f"> ⛰️ 月 `{month_name}` {bar(sea['month_exp'], sea['month_next'])} {sea['month_exp']}/{sea['month_next']}",
+        ("🌊 季",): f"> 🌊 季 `{quarter_name}` {bar(sea['quarter_exp'], sea['quarter_next'])} {sea['quarter_exp']}/{sea['quarter_next']}",
+        ("🌍 年",): f"> 🌍 年 `{year_name}` {bar(sea['year_exp'], sea['year_next'])} {sea['year_exp']}/{sea['year_next']}",
     }
 
     removed = False
@@ -260,10 +284,13 @@ def main():
     me, mn = season.get("month_exp", 0), season.get("month_next", 16)
     qe, qn = season.get("quarter_exp", 0), season.get("quarter_next", 61)
     ye, yn = season.get("year_exp", 0), season.get("year_next", 201)
+    m_name, _ = current_tier(me, MONTH_TIERS)
+    q_name, _ = current_tier(qe, QUARTER_TIERS)
+    y_name, _ = current_tier(ye, YEAR_TIERS)
     print(f"│ 🔥 境界 {state['realm']} ｜ 经验 {old_exp}→{state['exp_total']} · 金币 {old_coin}→{state['coin_balance']}")
-    print(f"│ ⛰️ 月 ⛺扎营 {bar(me, mn)} {me}/{mn}")
-    print(f"│ 🌊 季 🏖️港湾 {bar(qe, qn)} {qe}/{qn}")
-    print(f"│ 🌍 年 🌱苔原 {bar(ye, yn)} {ye}/{yn}")
+    print(f"│ ⛰️ 月 {m_name} {bar(me, mn)} {me}/{mn}")
+    print(f"│ 🌊 季 {q_name} {bar(qe, qn)} {qe}/{qn}")
+    print(f"│ 🌍 年 {y_name} {bar(ye, yn)} {ye}/{yn}")
     if upgrades:
         for u in upgrades:
             print(f"│ 🎉 {u}")
