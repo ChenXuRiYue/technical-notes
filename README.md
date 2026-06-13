@@ -1,12 +1,10 @@
 <div align="center">
 
-![](data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22440%22 height=%2250%22><text x=%22220%22 y=%2236%22 font-family=%22Georgia, 'Times New Roman', serif%22 font-size=%2232%22 fill=%22%237B9EBD%22 text-anchor=%22middle%22 letter-spacing=%223%22>technical-notes</text></svg>)
+# technical-notes
 
 ![Typing SVG](https://readme-typing-svg.demolab.com?font=Fira+Code&size=16&duration=4000&pause=1500&width=500&lines=%E6%90%AD%E5%A5%BD%E7%A7%AF%E6%9C%A8%EF%BC%8C%E8%B5%B7%E4%B8%AA%E5%A5%BD%E5%90%8D%E5%AD%97;Git%20%E6%98%AF%E7%BA%AF%E7%B2%B9%E6%9C%B4%E7%B4%A0%E7%9A%84%E5%AE%A1%E8%AE%A1%E7%B3%BB%E7%BB%9F;%E7%AC%94%E8%AE%B0%E6%98%AF%E4%B8%AA%E4%BA%BA%E6%9C%80%E7%BA%AF%E7%B2%B9%E7%9A%84%E7%90%86%E6%80%A7%E4%B8%8E%E6%84%9F%E6%80%A7;%E4%B8%BA%E4%BB%80%E4%B9%88%E4%B8%8D%E8%83%BD%E7%AC%AC%E4%B8%80%E6%AC%A1%E5%B0%B1%E6%8B%BF%E5%87%BA%E9%A2%97%E7%B3%96%E6%9E%9C;Agent%20%E6%98%AF%E8%A3%81%E5%88%A4%E9%95%BF%EF%BC%8C%E6%88%91%E4%B8%93%E6%B3%A8%E4%BA%AB%E5%8F%97%E6%B8%B8%E6%88%8F)
 
 </div>
-
----
 
 ## 📖 关于这个仓库
 
@@ -25,8 +23,6 @@
 | 📝 **Markdown** | 强大的表达能力 |
 
 精心设计的 git commit、git push 是很令人着迷的。对我来说就像搭好积木拿相机拍拍，起个好名字。这是具有浓烈仪式感的过程。
-
----
 
 ## 📌 为什么？
 
@@ -68,7 +64,6 @@
 
 </details>
 
----
 
 ## 📜 笔记观
 
