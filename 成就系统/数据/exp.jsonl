@@ -11,3 +11,4 @@
 {"ts": "2026-06-23", "task": "包管理工具对比", "tier": 1, "tier_name": "顺手", "exp": 2, "zone": "🎲普通5%", "roll": 1, "crit": true}
 {"ts": "2026-06-23", "task": "Gateway 网关，链路理解", "tier": 3, "tier_name": "投入", "exp": 7, "zone": "🎲普通5%", "roll": 56, "crit": false}
 {"ts": "2026-06-23", "task": "Zookeeper", "tier": 2, "tier_name": "轻松", "exp": 3, "zone": "🎲普通5%", "roll": 86, "crit": false}
+{"ts": "2026-06-23", "task": "依赖注入方式（Spring DI）", "tier": 2, "tier_name": "轻松", "exp": 3, "zone": "🎲普通5%", "roll": 9, "crit": false}
