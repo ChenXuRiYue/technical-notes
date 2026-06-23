@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Read",
+      "Glob",
+      "Grep",
+      "Bash(ls:*)",
+      "Bash(cat:*)",
+      "Bash(head:*)",
+      "Bash(tail:*)",
+      "Bash(less:*)",
+      "Bash(more:*)",
+      "Bash(find:*)",
+      "Bash(wc:*)",
+      "Bash(file:*)",
+      "Edit(成就系统/**)",
+      "Write(成就系统/**)",
+      "Edit(任务面板.md)",
+      "Bash(python3 成就系统/scripts/audit.py*)"
+    ]
+  }
+}

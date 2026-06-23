@@ -1,4 +1,4 @@
-# Claude Code 入口
+# Codex 入口
 
 本仓库的通用 Agent 协作规则维护在 `.common/AGENTS.md`。
 
