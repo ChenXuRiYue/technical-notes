@@ -410,6 +410,13 @@ eval "$(zoxide init zsh)"
 alias cd="z"
 ```
 
+**eza 颜色配置（.zshrc）**
+
+```bash
+# 目录默认灰色（避免亮蓝色刺眼）
+export EZA_COLORS="di=0"
+```
+
 🪏 工具替换对照
 
 | 老命令  | 新工具      | 改进点                        |
@@ -467,6 +474,34 @@ killp() { ps aux | grep "$1" | grep -v grep | awk '{print $2}' | xargs kill -9; 
 
 ### iTerm2 配置
 
+**为什么用 iTerm2 替代 Terminal.app**
+
+| 功能 | Terminal.app | iTerm2 |
+|------|-------------|--------|
+| Nerd Font 图标 | 支持有限 | ✅ 完美支持 |
+| 分屏 | ❌ | ✅ `Cmd+D` |
+| 热键窗口 | ❌ | ✅ `Cmd+`` 一键呼出 |
+| 搜索高亮 | 基础 | ✅ 强大 |
+| 自动补全 | ❌ | ✅ |
+| 配色主题 | 少 | ✅ 丰富 |
+| 半透明背景 | ❌ | ✅ |
+
+**安装**
+
+```bash
+brew install --cask iterm2
+```
+
+**设置为默认终端**
+
+iTerm2 → Settings → General → 勾选 `Set iTerm2 as default terminal`
+
+**字体配置（Nerd Font 图标）**
+
+1. 安装字体：`brew install --cask font-fira-code-nerd-font`
+2. iTerm2 设置：`Settings → Profiles → Text → Font` → 选择 `FiraCode Nerd Font`
+3. 勾选 **Use ligatures**（编程连字）
+
 **必改设置**
 
 | 设置项       | 路径                              | 推荐值                   |
@@ -483,6 +518,10 @@ killp() { ps aux | grep "$1" | grep -v grep | awk '{print $2}' | xargs kill -9; 
 | Dracula      | 对比度高     |
 | Catppuccin   | 柔和护眼     |
 | Tokyo Night  | 偏紫色调     |
+
+![image-20260605191343816](https://raw.githubusercontent.com/ChenXuRiYue/image-cloud/main/global/image-20260605191343816.png)
+
+
 
 ### 启动速度优化
 
