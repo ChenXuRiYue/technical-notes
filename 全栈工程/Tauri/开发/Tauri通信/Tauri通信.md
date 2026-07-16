@@ -339,3 +339,9 @@ fn download(app: AppHandle, url: String, on_event: Channel<DownloadEvent>) {
 }
 ```
 
+## 🛠️ GitTributary 实践回链
+
+- `#[tauri::command]` 是属性过程宏,但命令还需要进入 `generate_handler!` 注册列表。Rust 宏分类见 [宏](../../../../语言基础/rust/20.高级特性/20.5.宏.md)。
+- Command 通过 `State<'_, AppState>` 访问受管应用状态,见 [Tauri State 与应用状态](../../核心概念/State%20与应用状态.md)。
+- IPC 请求和响应依赖 Serde trait,见 [Serde 序列化与反序列化](../../../../语言基础/rust/生态库/Serde%20序列化与反序列化.md)。
+- 项目完整解读见 [Command 层代码阅读与架构演进](../../../../开源项目/GitTributary/技术经验/Command%20层代码阅读与架构演进.md)。
