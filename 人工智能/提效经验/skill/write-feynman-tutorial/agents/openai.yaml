@@ -1,0 +1,4 @@
+interface:
+  display_name: "费曼教程写作"
+  short_description: "用费曼闭环、前置补全与教学型 SVG 编写零基础教程"
+  default_prompt: "Use $write-feynman-tutorial to create or revise this beginner tutorial, choosing a teaching SVG when relationships are easier to understand visually."
