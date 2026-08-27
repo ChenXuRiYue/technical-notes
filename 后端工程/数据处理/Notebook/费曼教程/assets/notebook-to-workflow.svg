@@ -1,0 +1,133 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="1240" viewBox="0 0 1440 1240" role="img" aria-labelledby="notebook-flow-title notebook-flow-desc">
+  <title id="notebook-flow-title">急减速规则从交互验证到定时运行</title>
+  <desc id="notebook-flow-desc">急减速 Notebook 在 Runtime 中执行 Cell，通过 Spark 或 Ray 读取事件表与 Fileset 完成验证。配置调度后，数据工场保存项目文件快照、注入日期和阈值，生成场景清单，Kestra 再把 Notebook、切片和结果通知连接成工作流。</desc>
+  <defs>
+    <marker id="flow-arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L12,6 L0,12 Z" fill="#344054"/>
+    </marker>
+    <marker id="update-arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L12,6 L0,12 Z" fill="#B42318"/>
+    </marker>
+    <style>
+      .title { font: 700 38px -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; fill: #101828; }
+      .subtitle { font: 400 19px -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; fill: #475467; }
+      .section { font: 700 23px -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; fill: #101828; }
+      .box-title { font: 700 20px -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; fill: #101828; }
+      .body { font: 400 17px -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; fill: #344054; }
+      .small { font: 400 15px -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; fill: #475467; }
+      .mono { font: 600 15px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; fill: #182230; }
+      .arrow-label { font: 600 15px -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; fill: #344054; }
+      .warning { font: 600 15px -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; fill: #B42318; }
+      .arrow { stroke: #344054; stroke-width: 2.5; fill: none; marker-end: url(#flow-arrow); }
+      .update { stroke: #B42318; stroke-width: 2.5; stroke-dasharray: 8 6; fill: none; marker-end: url(#update-arrow); }
+    </style>
+  </defs>
+
+  <rect width="1440" height="1240" fill="#F8FAFC"/>
+  <text x="64" y="64" class="title">急减速规则从交互验证到定时运行</text>
+  <text x="64" y="98" class="subtitle">Notebook 源文件经过 Runtime 验证后，发布为带参数、资源和输出约定的离线作业</text>
+
+  <!-- Interactive ownership boundary -->
+  <rect x="52" y="130" width="1336" height="330" rx="8" fill="#FFFFFF" stroke="#1570EF" stroke-width="2"/>
+  <text x="78" y="168" class="section">开发验证：编写并运行 Notebook</text>
+
+  <rect x="92" y="202" width="350" height="170" rx="8" fill="#EFF8FF" stroke="#1570EF" stroke-width="2"/>
+  <text x="118" y="238" class="box-title">Notebook 源文件</text>
+  <text x="118" y="270" class="mono">hard-braking.ipynb</text>
+  <text x="118" y="302" class="body">Cell 源码、顺序、说明、已保存输出</text>
+  <text x="118" y="332" class="small">默认参数：日期、阈值、时间窗口</text>
+
+  <rect x="546" y="202" width="350" height="170" rx="8" fill="#F4F3FF" stroke="#6938EF" stroke-width="2"/>
+  <text x="572" y="238" class="box-title">交互 Runtime</text>
+  <text x="572" y="270" class="body">逐 Cell 执行，保存当前变量和临时视图</text>
+  <text x="572" y="302" class="body">连接 Spark / Ray 计算资源</text>
+  <text x="572" y="332" class="small">重启或中断会话：内存状态消失</text>
+
+  <rect x="990" y="202" width="350" height="170" rx="8" fill="#ECFDF3" stroke="#067647" stroke-width="2"/>
+  <text x="1016" y="238" class="box-title">表 + Fileset</text>
+  <text x="1016" y="270" class="body">表：日期、车辆、速度变化、日志路径</text>
+  <text x="1016" y="302" class="body">Fileset：视频、点云、原始日志</text>
+  <text x="1016" y="332" class="small">计算资源直接读取，数据不经过编辑页面</text>
+
+  <path d="M442 274 L536 274" class="arrow"/>
+  <text x="461" y="258" class="arrow-label">读取 Cell</text>
+  <path d="M896 274 L980 274" class="arrow"/>
+  <text x="910" y="258" class="arrow-label">读取</text>
+
+  <rect x="92" y="390" width="1248" height="44" rx="6" fill="#F2F4F7"/>
+  <text x="116" y="418" class="small">干净验证：保存文件 → 重启 Runtime → 从上到下运行全部 → 检查 E101、E103 与 scene-manifest.csv</text>
+
+  <!-- Transition -->
+  <path d="M267 372 L267 530" class="arrow"/>
+  <text x="80" y="486" class="arrow-label">配置调度</text>
+  <text x="80" y="510" class="arrow-label">复制代码快照</text>
+  <path d="M442 350 C500 420 500 486 402 540" class="update"/>
+  <text x="462" y="450" class="warning">源文件后续修改不会自动发布</text>
+  <text x="462" y="476" class="warning">需对比、更新并重新上线</text>
+
+  <!-- Production ownership boundary -->
+  <rect x="52" y="530" width="1336" height="390" rx="8" fill="#FFFFFF" stroke="#DC6803" stroke-width="2"/>
+  <text x="78" y="568" class="section">离线运行：发布并调度 Notebook 作业</text>
+
+  <rect x="92" y="618" width="276" height="190" rx="8" fill="#FFFAEB" stroke="#DC6803" stroke-width="2"/>
+  <text x="116" y="654" class="box-title">1. 项目文件快照</text>
+  <text x="116" y="686" class="mono">git/hard-braking/</text>
+  <text x="116" y="716" class="body">固定本次作业执行的 ipynb</text>
+  <text x="116" y="746" class="body">Notebook 目录就是 CWD</text>
+  <text x="116" y="778" class="small">代码版本与交互会话分离</text>
+
+  <rect x="416" y="618" width="276" height="190" rx="8" fill="#FFF4ED" stroke="#E04F16" stroke-width="2"/>
+  <text x="440" y="654" class="box-title">2. 参数 Cell 注入</text>
+  <text x="440" y="686" class="mono">-p event_date 2026-08-13</text>
+  <text x="440" y="716" class="mono">-p threshold_kmh 25</text>
+  <text x="440" y="746" class="body">在默认参数 Cell 后新增赋值</text>
+  <text x="440" y="778" class="small">后一次赋值决定最终变量值</text>
+
+  <rect x="740" y="618" width="276" height="190" rx="8" fill="#F4F3FF" stroke="#6938EF" stroke-width="2"/>
+  <text x="764" y="654" class="box-title">3. Spark / Ray 执行</text>
+  <text x="764" y="686" class="body">读取表和 Fileset</text>
+  <text x="764" y="716" class="body">应用日期、窗口和阈值</text>
+  <text x="764" y="746" class="body">按队列、CPU、内存并行计算</text>
+  <text x="764" y="778" class="small">失败受 retry 与 timeout 约束</text>
+
+  <rect x="1064" y="618" width="276" height="190" rx="8" fill="#ECFDF3" stroke="#067647" stroke-width="2"/>
+  <text x="1088" y="654" class="box-title">4. 声明输出</text>
+  <text x="1088" y="686" class="mono">scene-manifest.csv</text>
+  <text x="1088" y="716" class="body">E101、E103 与 raw_log_path</text>
+  <text x="1088" y="746" class="body">登记到 outputFiles</text>
+  <text x="1088" y="778" class="small">下游按同一路径键引用</text>
+
+  <path d="M368 713 L406 713" class="arrow"/>
+  <path d="M692 713 L730 713" class="arrow"/>
+  <path d="M1016 713 L1054 713" class="arrow"/>
+
+  <rect x="92" y="842" width="1248" height="48" rx="6" fill="#F2F4F7"/>
+  <text x="116" y="872" class="small">复现证据：工作流 revision + executionId + 实际参数 + 输入日期 + 输出文件与候选数量</text>
+
+  <!-- Workflow control boundary -->
+  <rect x="52" y="958" width="1336" height="206" rx="8" fill="#FFFFFF" stroke="#667085" stroke-width="2"/>
+  <text x="78" y="996" class="section">Kestra 工作流：连接节点顺序与运行状态</text>
+
+  <rect x="98" y="1030" width="246" height="76" rx="8" fill="#F2F4F7" stroke="#667085"/>
+  <text x="124" y="1062" class="box-title">Sensor</text>
+  <text x="124" y="1088" class="small">当天数据是否到齐？</text>
+
+  <rect x="418" y="1030" width="246" height="76" rx="8" fill="#FFFAEB" stroke="#DC6803"/>
+  <text x="444" y="1062" class="box-title">Notebook 节点</text>
+  <text x="444" y="1088" class="small">生成候选场景清单</text>
+
+  <rect x="738" y="1030" width="246" height="76" rx="8" fill="#EFF8FF" stroke="#1570EF"/>
+  <text x="764" y="1062" class="box-title">切片 / 标注节点</text>
+  <text x="764" y="1088" class="small">读取 raw_log_path</text>
+
+  <rect x="1058" y="1030" width="246" height="76" rx="8" fill="#ECFDF3" stroke="#067647"/>
+  <text x="1084" y="1062" class="box-title">DataOutput</text>
+  <text x="1084" y="1088" class="small">登记或通知结果</text>
+
+  <path d="M344 1068 L408 1068" class="arrow"/>
+  <path d="M664 1068 L728 1068" class="arrow"/>
+  <path d="M984 1068 L1048 1068" class="arrow"/>
+
+  <rect x="52" y="1182" width="1336" height="38" rx="6" fill="#E4E7EC"/>
+  <text x="78" y="1207" class="small">重建模型：Runtime 验证 Notebook → 数据工场保存快照并注入参数 → Spark/Ray 执行 → Kestra 把输出传给下游。</text>
+</svg>

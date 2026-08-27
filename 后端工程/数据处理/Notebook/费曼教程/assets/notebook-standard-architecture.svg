@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760" role="img" aria-labelledby="jupyter-architecture-title jupyter-architecture-desc">
+  <title id="jupyter-architecture-title">Notebook 把文档、交互界面和执行进程分开</title>
+  <desc id="jupyter-architecture-desc">工程师在 Notebook 编辑界面运行 Cell，Jupyter 服务层把代码请求发给 Kernel。Kernel 执行代码、保留内存变量并返回输出；服务层另外读写 ipynb 文档。集团 Runtime 还为 Kernel 提供环境和 Spark 或 Ray 资源。</desc>
+  <defs>
+    <marker id="architecture-arrow" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#344054"/>
+    </marker>
+    <marker id="architecture-arrow-blue" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#175CD3"/>
+    </marker>
+    <style>
+      .title { font: 700 32px -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; fill: #101828; }
+      .subtitle { font: 400 18px -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; fill: #475467; }
+      .section { font: 700 21px -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; fill: #101828; }
+      .box-title { font: 700 19px -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; fill: #101828; }
+      .body { font: 400 16px -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; fill: #344054; }
+      .small { font: 400 15px -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; fill: #475467; }
+      .mono { font: 600 16px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; fill: #182230; }
+      .label { font: 600 14px -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; fill: #344054; }
+      .arrow { stroke: #344054; stroke-width: 2.5; fill: none; marker-end: url(#architecture-arrow); }
+      .arrow-blue { stroke: #175CD3; stroke-width: 2.5; fill: none; marker-end: url(#architecture-arrow-blue); }
+      .dash { stroke-dasharray: 8 6; }
+    </style>
+  </defs>
+
+  <rect width="1200" height="760" fill="#F8FAFC"/>
+  <text x="56" y="58" class="title">Notebook 把文档、交互界面和执行进程分开</text>
+  <text x="56" y="90" class="subtitle">运行 Cell 是一次消息交互；保存 Notebook 是另一次文档写入</text>
+
+  <rect x="48" y="126" width="1104" height="352" rx="8" fill="#FFFFFF" stroke="#98A2B3" stroke-width="2"/>
+  <text x="72" y="164" class="section">Jupyter 标准中的典型分工</text>
+
+  <rect x="80" y="204" width="280" height="196" rx="8" fill="#EFF8FF" stroke="#1570EF" stroke-width="2"/>
+  <text x="104" y="242" class="box-title">Notebook 编辑界面</text>
+  <text x="104" y="278" class="body">编辑 Cell 与 Markdown</text>
+  <text x="104" y="310" class="body">发起执行、中断请求</text>
+  <text x="104" y="342" class="body">展示文本、表格、图形和错误</text>
+  <text x="104" y="374" class="small">平台对应：Notebook 开发页面</text>
+
+  <rect x="460" y="204" width="280" height="196" rx="8" fill="#FFF7ED" stroke="#DC6803" stroke-width="2"/>
+  <text x="484" y="242" class="box-title">Jupyter 服务层</text>
+  <text x="484" y="278" class="body">读取、保存 Notebook 文档</text>
+  <text x="484" y="310" class="body">管理 Kernel 连接</text>
+  <text x="484" y="342" class="body">转发执行请求与返回结果</text>
+  <text x="484" y="374" class="small">平台通常封装这一层</text>
+
+  <rect x="840" y="204" width="280" height="196" rx="8" fill="#F4F3FF" stroke="#6938EF" stroke-width="2"/>
+  <text x="864" y="242" class="box-title">Kernel / Runtime</text>
+  <text x="864" y="278" class="body">执行 Python 或其他语言代码</text>
+  <text x="864" y="310" class="body">保留已加载模块和内存变量</text>
+  <text x="864" y="342" class="body">返回标准输出、富媒体或错误</text>
+  <text x="864" y="374" class="small">平台额外提供环境与计算资源</text>
+
+  <path d="M360 274 L448 274" class="arrow-blue"/>
+  <text x="376" y="258" class="label">运行 Cell</text>
+  <path d="M460 332 L372 332" class="arrow"/>
+  <text x="382" y="354" class="label">展示输出</text>
+  <path d="M740 274 L828 274" class="arrow-blue"/>
+  <text x="754" y="258" class="label">代码请求</text>
+  <path d="M840 332 L752 332" class="arrow"/>
+  <text x="762" y="354" class="label">返回结果</text>
+
+  <rect x="80" y="530" width="420" height="152" rx="8" fill="#ECFDF3" stroke="#067647" stroke-width="2"/>
+  <text x="104" y="568" class="box-title">Notebook 文档：hard-braking.ipynb</text>
+  <text x="104" y="604" class="mono">cells[] + metadata + saved outputs</text>
+  <text x="104" y="636" class="body">文件保存的是文档状态</text>
+  <text x="104" y="664" class="small">不包含 Kernel 当前内存中的所有变量</text>
+
+  <rect x="700" y="530" width="420" height="152" rx="8" fill="#F2F4F7" stroke="#667085" stroke-width="2"/>
+  <text x="724" y="568" class="box-title">数据与分布式计算资源</text>
+  <text x="724" y="604" class="body">Kernel 通过平台环境调用 Spark / Ray</text>
+  <text x="724" y="636" class="body">计算引擎读取表和 Fileset</text>
+  <text x="724" y="664" class="small">大数据不需要先进入 Notebook 文档</text>
+
+  <path d="M560 400 L410 518" class="arrow dash"/>
+  <text x="412" y="470" class="label">读取 / 保存 JSON</text>
+  <path d="M980 400 L980 518" class="arrow dash"/>
+  <text x="994" y="468" class="label">提交计算</text>
+
+  <rect x="48" y="714" width="1104" height="30" rx="6" fill="#E4E7EC"/>
+  <text x="72" y="735" class="small">关键边界：.ipynb 保存文档；Kernel / Runtime 保留活的会话变量。</text>
+</svg>

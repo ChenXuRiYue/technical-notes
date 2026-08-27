@@ -1,0 +1,5 @@
+event_id,event_date,vehicle_id,speed_before_kmh,speed_after_kmh,window_seconds,raw_log_path
+E101,2026-08-12,V001,72,42,2,gvfs://fileset/autodrive/raw/E101/
+E102,2026-08-12,V002,50,41,2,gvfs://fileset/autodrive/raw/E102/
+E103,2026-08-12,V003,90,60,2,gvfs://fileset/autodrive/raw/E103/
+E104,2026-08-13,V004,65,35,2,gvfs://fileset/autodrive/raw/E104/
