@@ -1,0 +1,138 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="1160" viewBox="0 0 1440 1160" role="img" aria-labelledby="architecture-title architecture-desc">
+  <title id="architecture-title">Spring、Spark 与 Iceberg 的日报任务架构</title>
+  <desc id="architecture-desc">Spring 控制面创建 jobId 并通过 Outbox 传递任务，Submitter 创建 Spark Application，Driver 和 Executor 读取 Iceberg 订单表并提交日报 Snapshot，状态校准器将 applicationId 和结果证据回写任务库。</desc>
+  <defs>
+    <marker id="architecture-arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L12,6 L0,12 Z" fill="#344054"/>
+    </marker>
+    <marker id="architecture-data-arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L12,6 L0,12 Z" fill="#067647"/>
+    </marker>
+    <style>
+      .title { font: 700 38px -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; fill: #101828; }
+      .subtitle { font: 400 19px -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; fill: #475467; }
+      .lane { font: 700 23px -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; fill: #101828; }
+      .lane-note { font: 400 16px -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; fill: #475467; }
+      .box-title { font: 700 20px -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; fill: #101828; }
+      .body { font: 400 16px -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; fill: #344054; }
+      .small { font: 400 14px -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; fill: #475467; }
+      .mono { font: 600 15px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; fill: #182230; }
+      .arrow-label { font: 600 14px -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; fill: #344054; }
+      .data-label { font: 600 14px -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; fill: #067647; }
+      .step { font: 700 14px -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; fill: #FFFFFF; }
+      .control-arrow { stroke: #344054; stroke-width: 2.5; fill: none; marker-end: url(#architecture-arrow); }
+      .data-arrow { stroke: #067647; stroke-width: 3; fill: none; marker-end: url(#architecture-data-arrow); }
+      .status-arrow { stroke: #6938EF; stroke-width: 2.5; stroke-dasharray: 8 6; fill: none; marker-end: url(#architecture-arrow); }
+    </style>
+  </defs>
+
+  <rect width="1440" height="1160" fill="#F8FAFC"/>
+  <text x="64" y="64" class="title">一份订单日报如何穿过 Spring、Spark 与 Iceberg</text>
+  <text x="64" y="98" class="subtitle">贯穿身份：jobId=J42 → applicationId=app-42 → output Snapshot=S901</text>
+
+  <!-- Client -->
+  <rect x="64" y="136" width="250" height="96" rx="8" fill="#FFFFFF" stroke="#98A2B3" stroke-width="2"/>
+  <text x="88" y="174" class="box-title">客户端</text>
+  <text x="88" y="204" class="mono">POST reportDate=08-12</text>
+
+  <!-- Spring lane -->
+  <rect x="50" y="272" width="1340" height="224" rx="8" fill="#EFF8FF" stroke="#84CAFF" stroke-width="2"/>
+  <text x="74" y="310" class="lane">Spring 控制面</text>
+  <text x="74" y="338" class="lane-note">接收意图、创建任务、可靠传递命令；不承载订单数据</text>
+
+  <rect x="74" y="368" width="250" height="94" rx="8" fill="#FFFFFF" stroke="#1570EF" stroke-width="2"/>
+  <circle cx="100" cy="390" r="15" fill="#1570EF"/>
+  <text x="95" y="395" class="step">1</text>
+  <text x="126" y="398" class="box-title">Spring Web</text>
+  <text x="98" y="431" class="body">校验日期，创建 jobId=J42</text>
+
+  <rect x="390" y="368" width="280" height="94" rx="8" fill="#FFFFFF" stroke="#1570EF" stroke-width="2"/>
+  <circle cx="416" cy="390" r="15" fill="#1570EF"/>
+  <text x="411" y="395" class="step">2</text>
+  <text x="442" y="398" class="box-title">任务表 + Outbox</text>
+  <text x="414" y="431" class="mono">J42 / PENDING / event</text>
+
+  <rect x="736" y="368" width="250" height="94" rx="8" fill="#FFFFFF" stroke="#1570EF" stroke-width="2"/>
+  <circle cx="762" cy="390" r="15" fill="#1570EF"/>
+  <text x="757" y="395" class="step">3</text>
+  <text x="788" y="398" class="box-title">MQ</text>
+  <text x="760" y="431" class="mono">SparkJobRequested(J42)</text>
+
+  <rect x="1052" y="368" width="300" height="94" rx="8" fill="#FFFFFF" stroke="#1570EF" stroke-width="2"/>
+  <circle cx="1078" cy="390" r="15" fill="#1570EF"/>
+  <text x="1073" y="395" class="step">4</text>
+  <text x="1104" y="398" class="box-title">Submitter / Reconciler</text>
+  <text x="1076" y="431" class="body">提交、绑定 app-42、校准状态</text>
+
+  <path d="M150 232 L150 360" class="control-arrow"/>
+  <text x="72" y="264" class="arrow-label">创建任务请求</text>
+  <path d="M250 360 L250 240" class="status-arrow"/>
+  <text x="266" y="264" class="arrow-label">202 + jobId</text>
+  <path d="M324 415 L382 415" class="control-arrow"/>
+  <text x="334" y="397" class="arrow-label">同一事务</text>
+  <path d="M670 415 L728 415" class="control-arrow"/>
+  <text x="680" y="397" class="arrow-label">发布事件</text>
+  <path d="M986 415 L1044 415" class="control-arrow"/>
+  <text x="996" y="397" class="arrow-label">至少一次</text>
+
+  <!-- Spark lane -->
+  <rect x="50" y="544" width="1340" height="268" rx="8" fill="#F4F3FF" stroke="#BDB4FE" stroke-width="2"/>
+  <text x="74" y="582" class="lane">Spark 计算面</text>
+  <text x="74" y="610" class="lane-note">Application app-42：Driver 规划，Executor 并行处理</text>
+
+  <rect x="210" y="646" width="310" height="120" rx="8" fill="#FFFFFF" stroke="#6938EF" stroke-width="2"/>
+  <circle cx="238" cy="670" r="15" fill="#6938EF"/>
+  <text x="233" y="675" class="step">5</text>
+  <text x="266" y="678" class="box-title">Spark Driver</text>
+  <text x="238" y="711" class="body">解析 Job 参数，规划 Snapshot 扫描</text>
+  <text x="238" y="739" class="body">划分 Stage / Task，协调表提交</text>
+
+  <rect x="706" y="646" width="520" height="120" rx="8" fill="#FFFFFF" stroke="#6938EF" stroke-width="2"/>
+  <circle cx="734" cy="670" r="15" fill="#6938EF"/>
+  <text x="729" y="675" class="step">6</text>
+  <text x="762" y="678" class="box-title">Executor 1 / 2 / 3 / ...</text>
+  <text x="734" y="711" class="body">并行读取 Data File，按 merchant_id Shuffle 与聚合</text>
+  <text x="734" y="739" class="body">写出日报 Data File，向 Driver 返回文件统计</text>
+
+  <path d="M1202 462 L1202 532 L365 532 L365 638" class="control-arrow"/>
+  <text x="792" y="521" class="arrow-label">spark-submit / SparkApplication：jobId、日期、Job 版本、表名</text>
+  <path d="M520 706 L698 706" class="control-arrow"/>
+  <text x="548" y="688" class="arrow-label">下发 Stage 与 Task</text>
+  <path d="M706 746 L528 746" class="status-arrow"/>
+  <text x="544" y="772" class="arrow-label">Commit Message / Task 状态</text>
+
+  <!-- Iceberg lane -->
+  <rect x="50" y="860" width="1340" height="232" rx="8" fill="#ECFDF3" stroke="#75E0A7" stroke-width="2"/>
+  <text x="74" y="898" class="lane">Iceberg 表与提交层</text>
+  <text x="74" y="926" class="lane-note">Catalog 定位表版本；对象存储持久保存元数据与数据文件</text>
+
+  <rect x="92" y="958" width="320" height="94" rx="8" fill="#FFFFFF" stroke="#067647" stroke-width="2"/>
+  <text x="118" y="990" class="box-title">Iceberg Catalog</text>
+  <text x="118" y="1020" class="mono">orders → input Snapshot S900</text>
+
+  <rect x="550" y="958" width="360" height="94" rx="8" fill="#FFFFFF" stroke="#067647" stroke-width="2"/>
+  <text x="576" y="990" class="box-title">输入表 prod.sales.orders</text>
+  <text x="576" y="1020" class="body">Manifest 裁剪后提供订单 Data File</text>
+
+  <rect x="1048" y="958" width="300" height="94" rx="8" fill="#FFFFFF" stroke="#067647" stroke-width="2"/>
+  <text x="1074" y="990" class="box-title">输出日报表</text>
+  <text x="1074" y="1020" class="mono">output Snapshot S901</text>
+
+  <path d="M365 766 L365 950" class="control-arrow"/>
+  <text x="382" y="846" class="arrow-label">加载 S900 / 提交 S901</text>
+  <path d="M420 1005 L542 1005" class="data-arrow"/>
+  <text x="432" y="986" class="data-label">定位当前元数据</text>
+  <path d="M730 950 L730 820 L966 820 L966 774" class="data-arrow"/>
+  <text x="744" y="841" class="data-label">Executor 直接读取订单文件</text>
+  <path d="M966 774 L966 1005 L1040 1005" class="data-arrow"/>
+  <text x="986" y="940" class="data-label">写新 Data File</text>
+
+  <!-- Reconciliation -->
+  <path d="M1198 950 L1198 832 L1320 832 L1320 470" class="status-arrow"/>
+  <text x="1212" y="842" class="arrow-label">核对 S901</text>
+  <path d="M1202 462 L1202 480 L530 480 L530 464" class="status-arrow"/>
+  <text x="650" y="474" class="arrow-label">回写 applicationId、SUCCEEDED / FAILED、结果证据</text>
+
+  <rect x="50" y="1110" width="1340" height="34" rx="6" fill="#E4E7EC"/>
+  <text x="74" y="1133" class="small">成功链：Spring 接受任务 → Spark Application 完成计算 → Iceberg 发布结果 Snapshot → Reconciler 将证据回写任务状态。</text>
+</svg>

@@ -179,7 +179,7 @@ S1 = [A, B, C]
 
 - [数据处理与查询引擎](../../数据处理/README.md)：Spark、Flink、Trino 的独立教程与选型。
 - [Parquet、ORC 与 Avro](../数据文件格式/Parquet、ORC 与 Avro.md)：三种数据文件格式的结构和选择。
-- [Apache Spark](../../数据处理/Spark.md)：批处理、ETL 和维护任务的计算基础。
+- [Apache Spark](../../../数据处理/Spark/费曼教程/README.md)：批处理、ETL、Spring 异步任务和 Iceberg 读写的计算基础。
 - [Apache Flink](../../数据处理/Flink.md)：流处理、状态与 Checkpoint 基础。
 - [Trino](../../数据处理/Trino.md)：交互式 SQL 与 Connector 基础。
 

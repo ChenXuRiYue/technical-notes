@@ -1,0 +1,139 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1840" viewBox="0 0 1600 1840" role="img" aria-labelledby="title desc">
+  <title id="title">Iceberg 元数据层级与查询裁剪链路</title>
+  <desc id="desc">从 SQL 表名开始，经过 Catalog、Metadata JSON、Snapshot、Manifest List、Manifest，最终定位 Data File 和 Delete File，并展示查询规划器逐层裁剪文件。</desc>
+  <defs>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L12,6 L0,12 Z" fill="#344054"/>
+    </marker>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="125%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#101828" flood-opacity="0.10"/>
+    </filter>
+    <style>
+      .title { font: 700 42px -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; fill: #101828; }
+      .subtitle { font: 400 21px -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; fill: #475467; }
+      .step { font: 700 19px -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; fill: #ffffff; }
+      .box-title { font: 700 28px -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; fill: #101828; }
+      .body { font: 400 20px -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; fill: #344054; }
+      .small { font: 400 17px -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; fill: #475467; }
+      .strong { font: 700 19px -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; fill: #101828; }
+      .mono { font: 500 18px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; fill: #182230; }
+      .mono-light { font: 500 18px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; fill: #FFFFFF; }
+      .mono-small { font: 500 16px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; fill: #182230; }
+      .arrow-label { font: 600 17px -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; fill: #344054; }
+      .lane-title { font: 700 18px -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; fill: #175CD3; }
+      .pruned { font: 600 17px -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; fill: #B42318; }
+      .kept { font: 600 17px -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; fill: #067647; }
+    </style>
+  </defs>
+
+  <rect width="1600" height="1840" fill="#F8FAFC"/>
+
+  <text x="80" y="76" class="title">一张 Iceberg 表如何找到要读取的文件</text>
+  <text x="80" y="116" class="subtitle">示例查询：读取 2026-08-02 之后的 user_events。每一层保存下一层的引用，并逐步缩小候选文件。</text>
+
+  <rect x="80" y="158" width="1440" height="104" rx="8" fill="#101828"/>
+  <text x="112" y="198" class="step">查询输入</text>
+  <text x="112" y="235" class="mono-light">SELECT * FROM prod.analytics.user_events WHERE event_time &gt;= '2026-08-02'</text>
+
+  <rect x="1160" y="300" width="360" height="1440" rx="8" fill="#EFF8FF" stroke="#B2DDFF" stroke-width="2" stroke-dasharray="8 8"/>
+  <text x="1192" y="344" class="lane-title">查询规划器在这一层做什么</text>
+
+  <rect x="80" y="300" width="1020" height="194" rx="8" fill="#FFFFFF" stroke="#84CAFF" stroke-width="3" filter="url(#shadow)"/>
+  <rect x="80" y="300" width="154" height="194" rx="8" fill="#1570EF"/>
+  <text x="112" y="346" class="step">第 1 层</text>
+  <text x="112" y="379" class="step">Catalog</text>
+  <text x="268" y="345" class="box-title">表名的权威入口</text>
+  <text x="268" y="382" class="body">输入逻辑表名，返回当前已提交的 Metadata JSON 地址</text>
+  <rect x="268" y="405" width="790" height="56" rx="6" fill="#EFF8FF"/>
+  <text x="292" y="440" class="mono-small">analytics.user_events → s3://warehouse/user_events/metadata/v18.metadata.json</text>
+  <text x="1192" y="393" class="strong">加载当前表入口</text>
+  <text x="1192" y="425" class="small">得到 v18 的完整存储地址</text>
+
+  <path d="M590 494 L590 540" stroke="#344054" stroke-width="3" fill="none" marker-end="url(#arrow)"/>
+  <text x="614" y="526" class="arrow-label">读取这个地址</text>
+
+  <rect x="52" y="540" width="1076" height="1200" rx="10" fill="none" stroke="#98A2B3" stroke-width="2" stroke-dasharray="10 10"/>
+  <rect x="72" y="522" width="244" height="38" rx="6" fill="#F2F4F7"/>
+  <text x="92" y="548" class="strong">Warehouse / 对象存储</text>
+
+  <rect x="80" y="574" width="1020" height="210" rx="8" fill="#FFFFFF" stroke="#FEC84B" stroke-width="3" filter="url(#shadow)"/>
+  <rect x="80" y="574" width="154" height="210" rx="8" fill="#DC6803"/>
+  <text x="112" y="620" class="step">第 2 层</text>
+  <text x="104" y="653" class="step">Metadata</text>
+  <text x="126" y="682" class="step">JSON</text>
+  <text x="268" y="619" class="box-title">v18.metadata.json：这一版表级说明书</text>
+  <text x="268" y="656" class="body">保存 Schema、分区规则、排序规则、表属性和 Snapshot 历史</text>
+  <rect x="268" y="679" width="790" height="70" rx="6" fill="#FFFAEB"/>
+  <text x="292" y="708" class="mono-small">current-snapshot-id: 102</text>
+  <text x="292" y="735" class="mono-small">snapshots: [S100, S101, S102]</text>
+  <text x="1192" y="643" class="strong">选择表版本</text>
+  <text x="1192" y="675" class="small">普通查询选 S102</text>
+  <text x="1192" y="703" class="small">时间旅行可改选 S100 / S101</text>
+
+  <path d="M590 784 L590 830" stroke="#344054" stroke-width="3" fill="none" marker-end="url(#arrow)"/>
+  <text x="614" y="816" class="arrow-label">按 current-snapshot-id 选择 S102</text>
+
+  <rect x="80" y="830" width="1020" height="162" rx="8" fill="#FFFFFF" stroke="#A6F4C5" stroke-width="3" filter="url(#shadow)"/>
+  <rect x="80" y="830" width="154" height="162" rx="8" fill="#067647"/>
+  <text x="112" y="876" class="step">第 3 层</text>
+  <text x="102" y="909" class="step">Snapshot</text>
+  <text x="268" y="875" class="box-title">Snapshot S102：一次成功提交形成的表版本</text>
+  <text x="268" y="912" class="body">指向这一版使用的 Manifest List</text>
+  <rect x="268" y="934" width="790" height="36" rx="6" fill="#ECFDF3"/>
+  <text x="292" y="958" class="mono-small">manifest-list: metadata/snap-102.avro</text>
+  <text x="1192" y="890" class="strong">锁定一致的版本边界</text>
+  <text x="1192" y="922" class="small">本次查询后续都沿 S102 规划</text>
+
+  <path d="M590 992 L590 1038" stroke="#344054" stroke-width="3" fill="none" marker-end="url(#arrow)"/>
+  <text x="614" y="1024" class="arrow-label">读取 S102 的 Manifest List</text>
+
+  <rect x="80" y="1038" width="1020" height="202" rx="8" fill="#FFFFFF" stroke="#BDB4FE" stroke-width="3" filter="url(#shadow)"/>
+  <rect x="80" y="1038" width="154" height="202" rx="8" fill="#6938EF"/>
+  <text x="112" y="1084" class="step">第 4 层</text>
+  <text x="102" y="1117" class="step">Manifest</text>
+  <text x="126" y="1146" class="step">List</text>
+  <text x="268" y="1083" class="box-title">snap-102.avro：这一版包含哪些 Manifest</text>
+  <text x="268" y="1120" class="body">每条记录指向一个 Manifest，并带有分区范围摘要</text>
+  <rect x="268" y="1144" width="380" height="62" rx="6" fill="#FEF3F2" stroke="#FDA29B"/>
+  <text x="288" y="1171" class="mono-small">M-A: event_day = 07-31</text>
+  <text x="288" y="1195" class="pruned">裁剪：整份 Manifest 不再读取</text>
+  <rect x="678" y="1144" width="380" height="62" rx="6" fill="#ECFDF3" stroke="#75E0A7"/>
+  <text x="698" y="1171" class="mono-small">M-B: event_day = 08-01..08-03</text>
+  <text x="698" y="1195" class="kept">保留：继续检查其中的文件</text>
+  <text x="1192" y="1098" class="strong">Manifest 级裁剪</text>
+  <text x="1192" y="1130" class="small">用 WHERE 条件比较分区摘要</text>
+  <text x="1192" y="1158" class="small">先排除整批不可能命中的文件</text>
+
+  <path d="M810 1240 L810 1286" stroke="#344054" stroke-width="3" fill="none" marker-end="url(#arrow)"/>
+  <text x="834" y="1272" class="arrow-label">只读取保留下来的 M-B</text>
+
+  <rect x="80" y="1286" width="1020" height="224" rx="8" fill="#FFFFFF" stroke="#F9A8D4" stroke-width="3" filter="url(#shadow)"/>
+  <rect x="80" y="1286" width="154" height="224" rx="8" fill="#C11574"/>
+  <text x="112" y="1332" class="step">第 5 层</text>
+  <text x="102" y="1365" class="step">Manifest</text>
+  <text x="268" y="1331" class="box-title">M-B.avro：逐个列出 Data File / Delete File</text>
+  <text x="268" y="1368" class="body">记录文件地址、分区值、列上下界、空值数、记录数等统计</text>
+  <rect x="268" y="1392" width="790" height="82" rx="6" fill="#FDF2FA"/>
+  <text x="292" y="1420" class="mono-small">A.parquet  event_time: 08-01 00:00 .. 08-01 23:59  → 裁剪</text>
+  <text x="292" y="1447" class="mono-small">B.parquet  event_time: 08-02 00:00 .. 08-02 23:59  → 保留</text>
+  <text x="292" y="1472" class="mono-small">D.delete   影响 B.parquet 中的部分行                  → 保留</text>
+  <text x="1192" y="1356" class="strong">文件级裁剪</text>
+  <text x="1192" y="1388" class="small">比较列上下界与查询条件</text>
+  <text x="1192" y="1416" class="small">产出最终扫描任务</text>
+
+  <path d="M590 1510 L590 1556" stroke="#344054" stroke-width="3" fill="none" marker-end="url(#arrow)"/>
+  <text x="614" y="1542" class="arrow-label">把候选文件交给 Worker</text>
+
+  <rect x="80" y="1556" width="1020" height="150" rx="8" fill="#FFFFFF" stroke="#FDA29B" stroke-width="3" filter="url(#shadow)"/>
+  <rect x="80" y="1556" width="154" height="150" rx="8" fill="#B42318"/>
+  <text x="112" y="1602" class="step">第 6 层</text>
+  <text x="100" y="1635" class="step">实际文件</text>
+  <text x="268" y="1601" class="box-title">B.parquet + D.delete</text>
+  <text x="268" y="1638" class="body">Data File 保存业务行；Delete File 指明哪些行在这一版中应当失效</text>
+  <text x="268" y="1672" class="small">Worker 读取 B，应用 D，再执行剩余过滤、投影、聚合或 Join</text>
+  <text x="1192" y="1618" class="strong">执行扫描</text>
+  <text x="1192" y="1650" class="small">读取候选文件并应用删除</text>
+
+  <rect x="80" y="1770" width="1440" height="48" rx="8" fill="#E4E7EC"/>
+  <text x="108" y="1802" class="strong">一句话：Catalog 找入口 → Metadata JSON 选版本 → Snapshot 找清单 → 两级 Manifest 裁剪 → Worker 读候选文件。</text>
+</svg>

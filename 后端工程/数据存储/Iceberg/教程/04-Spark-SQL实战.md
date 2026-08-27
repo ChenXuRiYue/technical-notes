@@ -2,6 +2,8 @@
 
 这一篇把前面画在纸上的 Snapshot 真正跑出来。你会从一个本地空目录开始，依次完成建表、写入、查看 Snapshot、`MERGE`、时间旅行和元数据排查。
 
+本篇所有 SQL 示例都使用 Spark SQL 方言。Spark 负责解析和执行语句，Iceberg Runtime 负责把这些操作转换为 Iceberg 表的元数据与文件变更；方言关系见 [SQL、方言与 Iceberg 的关系](00-零基础前置课.md#-sql方言与-iceberg-的关系)。
+
 生产示例沿用 `prod.analytics.user_events`；零基础练习先使用本地 `local.analytics.user_events`。`local` 和 `prod` 是当前 Spark 环境中的 Catalog 别名，实际表由别名背后的 Catalog 配置与 Warehouse 共同确定。
 
 ## 📄 学完后的验收标准
@@ -85,7 +87,7 @@ CREATE TABLE local.analytics.user_events (
     payload      STRING
 )
 USING iceberg
-PARTITIONED BY (day(event_time))
+PARTITIONED BY (days(event_time))
 TBLPROPERTIES (
     'format-version' = '2',
     'write.format.default' = 'parquet'
@@ -178,7 +180,7 @@ CREATE TABLE prod.analytics.user_events (
     payload      STRING
 )
 USING iceberg
-PARTITIONED BY (day(event_time))
+PARTITIONED BY (days(event_time))
 TBLPROPERTIES (
     'format-version' = '2',
     'write.format.default' = 'parquet',
@@ -390,6 +392,7 @@ SELECT * FROM prod.analytics.user_events.manifests;
 
 ## 🗺️ 修订记录
 
+- 2026-08-13：标明 Spark SQL 方言边界，并统一按 `days(event_time)` 编写 Spark 建表语法。
 - 2026-08-12：补充本地零基础环境、无外部依赖的样例数据、两次快照验证、MERGE 练习、排错表和费曼复述。
 - 2026-08-06：从 Iceberg 主笔记拆出 Spark SQL 建表、写入、历史查询和元数据排查操作。
 
