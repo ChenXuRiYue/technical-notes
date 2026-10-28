@@ -2,11 +2,17 @@
 
 ## 🔖 文件操作
 
-⚙️ 创建文件
+**⚙️ 创建文件**
 
 - `touch ~/.config/opencode/opencode.json`
 
 
+
+⚙️ **软链接文件、目录**
+
+- 文件：` ln -s /Users/yourname/Documents/config.yml /usr/local/bin/config.yml`
+- 目录：`ln -s /Users/yourname/Downloads ~/Desktop/Downloads `
+- 特殊路径：包含空格：`ln -s "/Users/yourname/My Files" "/Users/yourname/Desktop/My Link"`
 
 
 
