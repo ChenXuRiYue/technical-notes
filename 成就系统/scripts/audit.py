@@ -106,6 +106,39 @@ def current_tier(exp, tiers):
     return tiers[-1][1], float("inf")
 
 
+def quarter_key(dt):
+    return f"{dt.year}-Q{(dt.month - 1) // 3 + 1}"
+
+
+def roll_seasons(season, now):
+    """跨周期时重置窗口积分，切换到当前月/季/年。"""
+    rollovers = []
+    current_month = now.strftime("%Y-%m")
+    current_quarter = quarter_key(now)
+    current_year = str(now.year)
+
+    if season.get("month") != current_month:
+        rollovers.append(f"⛰️ 月赛季：{season.get('month', '未知')}→{current_month}")
+        season["month"] = current_month
+        season["month_exp"] = 0
+        season["month_next"] = MONTH_TIERS[0][0]
+        season["month_challenge"] = None
+
+    if season.get("quarter") != current_quarter:
+        rollovers.append(f"🌊 季赛季：{season.get('quarter', '未知')}→{current_quarter}")
+        season["quarter"] = current_quarter
+        season["quarter_exp"] = 0
+        season["quarter_next"] = QUARTER_TIERS[0][0]
+
+    if season.get("year") != current_year:
+        rollovers.append(f"🌍 年赛季：{season.get('year', '未知')}→{current_year}")
+        season["year"] = current_year
+        season["year_exp"] = 0
+        season["year_next"] = YEAR_TIERS[0][0]
+
+    return rollovers
+
+
 def update_season(season, exp_gain):
     now = datetime.now()
     season["month_exp"] += exp_gain
@@ -242,6 +275,7 @@ def main():
 
     # 更新赛季
     season = state.get("season", {})
+    rollovers = roll_seasons(season, now)
     upgrades = update_season(season, exp_gain)
 
     # 写入记录
@@ -278,6 +312,8 @@ def main():
     print(f"│ 🎲 掷{roll}  (爆率{zone_rate}%{' 暴击！' if crit else ' 未中'})")
     if crit:
         print(f"│ 🎰 暴击！经验 ×2  (爆率{zone_rate}% 掷出{roll})")
+    for rollover in rollovers:
+        print(f"│ 🔄 {rollover}")
     if new_combo >= 2:
         print(f"│ 🔥 连击 ×{new_combo}  (+{combo_bonus})")
     print("│ ──────────────────────")
